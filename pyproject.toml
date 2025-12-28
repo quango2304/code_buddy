@@ -1,0 +1,18 @@
+[project]
+name = "code-buddy"
+version = "0.1.0"
+description = "Code buddy coding agent"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "langchain-anthropic>=1.3.0", # Anthropic Claude integration
+    "langchain-google-genai>=4.1.2", # Google Gemini integration
+    "python-dotenv>=1.2.1", # Loads environment variables from .env
+]
+
+[project.scripts]
+code-buddy = "src.main:main" # CLI command: `code-buddy`
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["src*"]

@@ -45,14 +45,102 @@ Follow below steps to install the agent in editable mode and add an alias to you
 uv pip install -e .
 
 # Add alias to your shell config (~/.zshrc or ~/.bashrc)
-alias coding-agent='<project_absolute_path>/.venv/bin/code-buddy'
+alias coding-buddy='<project_absolute_path>/.venv/bin/code-buddy'
 ```
+
+## MCP (Model Context Protocol) Support
+
+Code Buddy supports [MCP](http://modelcontextprotocol.io) servers to extend the agent's capabilities with additional tools.
+
+### Configuration Locations
+
+MCP servers are loaded from two locations (in order):
+
+1. **Default servers**: `src/mcp/default_mcp_servers.json` (bundled with the package)
+2. **Project-specific servers**: `.code-buddy/mcp_servers.json` (in your current working directory)
+
+### Configuration Format
+
+Create a `mcp_servers.json` file with the following structure:
+
+#### Stdio Server (Local)
+
+```json
+{
+    "mcpServers": {
+        "my-local-server": {
+            "command": "npx",
+            "args": ["-y", "@modelcontextprotocol/server-filesystem", "/path/to/allowed/dir"],
+            "env": {
+                "OPTIONAL_ENV_VAR": "value"
+            }
+        }
+    }
+}
+```
+
+#### Remote Server (HTTP)
+
+```json
+{
+    "mcpServers": {
+        "my-remote-server": {
+            "url": "https://mcp.example.com/sse",
+            "headers": {
+                "Authorization": "Bearer your-api-key"
+            }
+        }
+    }
+}
+```
+
+### Default MCP Servers
+
+The following MCP servers are included by default:
+
+```json
+{
+    "mcpServers": {
+        "auggie": {
+            "command": "auggie",
+            "args": ["--mcp"]
+        }
+    }
+}
+```
+
+> **Note:** For the Auggie MCP server to work, you need to install and authenticate first:
+> ```bash
+> npm install -g auggie
+> auggie login
+> ```
+
+### Adding Project-Specific Servers
+
+1. Create the config directory:
+   ```bash
+   mkdir -p .code-buddy
+   ```
+
+2. Create `.code-buddy/mcp_servers.json`:
+   ```json
+   {
+       "mcpServers": {
+           "your-server": {
+               "command": "your-command",
+               "args": ["--your-args"]
+           }
+       }
+   }
+   ```
+
+3. Restart the agent to load the new configuration.
 
 ## Roadmap
 
 1. Simple agent CLI loop – ✅ done
 2. Tools (file operations, command execution, search) – ✅ done
-3. MCP support with configurable settings (http://modelcontextprotocol.io)
+3. MCP support with configurable settings – ✅ done
 4. ACP support for IDE integration (http://agentclientprotocol.com)
 5. Prompt compression for long-running contexts 
 6. Memory, rules, and task management

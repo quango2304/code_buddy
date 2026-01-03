@@ -7,7 +7,7 @@ from src.cli_agent.cli_agent import run_agent_loop
 
 def main():
     # Load environment variables
-    load_dotenv()
+    load_dotenv(override=True)
     # Run the agent
     asyncio.run(run_agent_loop())
 

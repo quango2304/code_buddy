@@ -1,6 +1,7 @@
 from langchain_core.messages import ToolCall
 from langchain_core.tools.base import BaseTool
 
+from src.mcp.mcp_tools import get_mcp_tools
 from src.tools.command_tools import run_command, \
     read_command_output, send_command_input
 from src.tools.grep_search import grep_search
@@ -18,6 +19,10 @@ async def get_all_tools() -> list[BaseTool]:
         grep_search,
         *get_langchain_tools(),
     ]
+
+    mcp_tools = await get_mcp_tools()
+    tools.extend(mcp_tools)
+
     return tools
 
 async def execute_tool(tools: list[BaseTool], tool_call: ToolCall) -> str:
@@ -37,7 +42,7 @@ async def execute_tool(tools: list[BaseTool], tool_call: ToolCall) -> str:
     # Execute the tool and return the result
     try:
         result = await tool.ainvoke(tool_args)
-        print(f"\n📦 Tool result:\n{result[:100]}...")
+        print(f"\n📦 Tool result:\n{str(result)[:100]}...")
         return str(result)
     except Exception as e:
         print(f"Error executing tool '{tool_name}': {str(e)}")

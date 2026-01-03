@@ -1,8 +1,8 @@
+from src.mcp.mcp_tools import cleanup_mcp_connections
 from src.model import create_model, load_system_prompt
 from langchain_core.messages import AIMessage, HumanMessage, ToolMessage, \
     SystemMessage, BaseMessage
 from langchain_core.tools.base import BaseTool
-from langchain_core.language_models.chat_models import BaseChatModel
 
 from src.tools.tool import execute_tool, get_all_tools
 
@@ -19,41 +19,44 @@ async def run_agent_loop():
 
     print("Agent ready. Type 'quit' to exit.")
 
-    while True:
-        # Get user input
-        print(f"{"---" * 20}")
-        user_input = input("[You]: ").strip()
-
-        # Check for exit condition
-        if user_input.lower() == "quit":
-            print("Goodbye!")
-            break
-
-        if not user_input:
-            continue
-
-        # Append the user message to history
-        messages.append(HumanMessage(content=user_input))
-
+    try:
         while True:
-            response: AIMessage = await model.ainvoke(messages)
-            messages.append(response)
-            # Check if there are tool calls to handle
-            if response.tool_calls:
-                # print the thinking blocks
-                _print_agent_text_output(response)
-                # Execute each tool call
-                for tool_call in response.tool_calls:
-                    result = await execute_tool(tools, tool_call)
-                    tool_message = ToolMessage(
-                        content=result,
-                        tool_call_id=tool_call["id"],
-                    )
-                    messages.append(tool_message)
-            else:
-                # No more tool calls - print the text response and break
-                _print_agent_text_output(response)
+            # Get user input
+            print(f"{"---" * 20}")
+            user_input = input("[You]: ").strip()
+
+            # Check for exit condition
+            if user_input.lower() == "quit":
+                print("Goodbye!")
                 break
+
+            if not user_input:
+                continue
+
+            # Append the user message to history
+            messages.append(HumanMessage(content=user_input))
+
+            while True:
+                response: AIMessage = await model.ainvoke(messages)
+                messages.append(response)
+                # Check if there are tool calls to handle
+                if response.tool_calls:
+                    # print the thinking blocks
+                    _print_agent_text_output(response)
+                    # Execute each tool call
+                    for tool_call in response.tool_calls:
+                        result = await execute_tool(tools, tool_call)
+                        tool_message = ToolMessage(
+                            content=result,
+                            tool_call_id=tool_call["id"],
+                        )
+                        messages.append(tool_message)
+                else:
+                    # No more tool calls - print the text response and break
+                    _print_agent_text_output(response)
+                    break
+    finally:
+        await cleanup_mcp_connections()
 
 
 def _print_agent_text_output(response: AIMessage):

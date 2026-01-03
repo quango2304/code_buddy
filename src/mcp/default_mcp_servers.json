@@ -1,0 +1,10 @@
+{
+    "mcpServers": {
+        "auggie": {
+            "command": "auggie",
+            "args": [
+                "--mcp"
+            ]
+        }
+    }
+}

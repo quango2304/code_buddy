@@ -1,0 +1,48 @@
+@startuml
+title Tool Execution Flow
+
+participant "User" as User
+participant "MCP Client\n(Coding Agent)" as Agent
+participant "LLM" as LLM
+participant "MCP Server\n(stdio / http)" as MCP
+
+
+== Tool Discovery ==
+
+group #LightYellow Tool Discovery
+    Agent -> MCP: Initialize connection
+    Agent -> MCP: Request tool list
+    MCP --> Agent: Tool definitions\n(name, input, description, output)
+
+    Agent -> LLM: Provide tools\n(MCP tools + internal tools)
+end
+
+== Agent Loop ==
+
+group Agent Execution Loop
+    User -> Agent: User message
+    Agent --> LLM: User message
+    loop Until LLM returns normal message
+        LLM -> Agent: Response
+
+        alt Tool Call
+            Agent -> Agent: Parse tool name + input
+
+            alt Is Internal Tool?\n(implemented in part 2)
+                Agent -> Agent: Execute local tool
+                Agent --> LLM: Tool result
+            else #LightYellow Is MCP Tool?\n(implemented in this part)
+                Agent -> MCP: Execute MCP tool\n(name + input)
+                MCP -> MCP: Run tool
+                MCP --> Agent: Tool result
+                Agent --> LLM: Tool result
+            end
+
+        else Normal Message
+            Agent --> User: Final response
+            break
+        end
+    end
+end
+
+@enduml

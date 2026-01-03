@@ -15,6 +15,7 @@ def create_model() -> BaseChatModel:
         return ChatGoogleGenerativeAI(
             model=os.getenv("GEMINI_MODEL"),
             api_key=os.getenv("GOOGLE_API_KEY"),
+            client_options={"api_endpoint": os.getenv("GEMINI_BASE_URL")} if os.getenv("GEMINI_BASE_URL") else None,
             thinking_budget=5000
         )
     elif provider == "anthropic":

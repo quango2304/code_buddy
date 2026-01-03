@@ -136,11 +136,23 @@ The following MCP servers are included by default:
 
 3. Restart the agent to load the new configuration.
 
+## ACP (Agent Communication Protocol) Support
+
+Code Buddy supports [ACP](https://agentcommunicationprotocol.dev/) for IDE integration via stdio communication.
+
+### Running the ACP Server
+
+```bash
+uv run python -m src.main --acp
+```
+
+The agent communicates via JSON-RPC over stdio, making it compatible with any ACP-enabled IDE or editor.
+
 ## Roadmap
 
 1. Simple agent CLI loop – ✅ done
 2. Tools (file operations, command execution, search) – ✅ done
 3. MCP support with configurable settings – ✅ done
-4. ACP support for IDE integration (http://agentclientprotocol.com)
+4. ACP support for IDE integration – ✅ done
 5. Prompt compression for long-running contexts 
 6. Memory, rules, and task management

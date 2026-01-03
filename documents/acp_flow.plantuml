@@ -1,0 +1,41 @@
+@startuml ACP Flow
+
+title ACP (Agent Communication Protocol) Flow
+
+actor User
+participant "ACP Client\n(IDE)" as Client
+participant "ACP Agent\n(Coding Agent)" as Agent
+
+== Initialization ==
+
+User -> Client: Launch IDE
+Client -> Agent: Spawn agent process
+activate Agent
+Agent --> Client: Return capabilities\n(available modes, models)
+Client --> User: Display agent ready
+
+== Session Management ==
+User -> Client: New chat session
+Client -> Agent: Create chat session
+Agent --> Client: Session created\n(session_id)
+
+== Prompt & Response Loop ==
+
+User -> Client: Enter prompt
+Client -> Agent: Send user prompt\n(session_id, message)
+activate Agent #LightBlue
+
+loop Tool Execution (if needed)
+    Agent -> Agent: Process prompt\nwith LLM
+    Agent --> Client: Send tool use update\n(tool_name, parameters)
+    Client --> User: Display tool call
+    Agent -> Agent: Execute tool
+    Agent --> Client: Send tool result update\n(tool_name, result)
+    Client --> User: Display tool result
+end
+
+Agent --> Client: Send LLM response update\n(text, reasoning)
+Client --> User: Display response
+deactivate Agent
+
+@enduml

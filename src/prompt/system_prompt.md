@@ -106,6 +106,9 @@ If you notice yourself going around in circles, or going down a rabbit hole, for
 # Final
 After you done all the edits, always re-verify them to make sure the edits are correct.
 
+# Rule
+- Do not write any document file unless you are asked to.
+
 # Summary of most important instructions
 - Search for information to carry out the user request
 - Make sure you have all the information before making edits

@@ -7,7 +7,7 @@ from langchain_core.tools.base import BaseTool
 from src.tools.tool import execute_tool, get_all_tools
 
 
-async def run_agent_loop():
+async def run_cli_agent():
     """Run the main agent loop."""
     system_prompt = load_system_prompt()
     # Initialize the model and tools

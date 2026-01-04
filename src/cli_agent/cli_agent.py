@@ -1,5 +1,8 @@
+import os
+
 from src.mcp.mcp_tools import cleanup_mcp_connections
 from src.model import create_model, load_system_prompt
+from src.utils.prompt_compaction import compact_messages_if_needed
 from langchain_core.messages import AIMessage, HumanMessage, ToolMessage, \
     SystemMessage, BaseMessage
 from langchain_core.tools.base import BaseTool
@@ -39,6 +42,13 @@ async def run_cli_agent():
             while True:
                 response: AIMessage = await model.ainvoke(messages)
                 messages.append(response)
+
+                # Check if we need to compact messages based on input token usage
+                input_tokens = response.usage_metadata.get("input_tokens", 0) if response.usage_metadata else 0
+                messages = await compact_messages_if_needed(
+                    messages=messages,
+                    current_input_tokens=input_tokens
+                )
                 # Check if there are tool calls to handle
                 if response.tool_calls:
                     # print the thinking blocks

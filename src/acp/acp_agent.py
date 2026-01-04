@@ -25,6 +25,7 @@ from langchain_core.messages import AIMessage
 
 from src.acp.session import SessionManager
 from src.model import create_model, load_system_prompt
+from src.utils.prompt_compaction import compact_messages_if_needed
 from src.tools.tool import get_all_tools, execute_tool
 from src.mcp.mcp_tools import cleanup_mcp_connections
 import sys
@@ -172,6 +173,12 @@ class ACPAgent(Agent):
             response: AIMessage = await model.ainvoke(session.messages)
             session.add_ai_message(response)
 
+            # Check if we need to compact messages based on input token usage
+            input_tokens = response.usage_metadata.get("input_tokens", 0) if response.usage_metadata else 0
+            session.messages = await compact_messages_if_needed(
+                messages=session.messages,
+                current_input_tokens=input_tokens
+            )
             # Check for cancellation after LLM response
             if session.is_cancelled():
                 return PromptResponse(stop_reason="cancelled")

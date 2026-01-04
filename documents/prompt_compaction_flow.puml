@@ -1,0 +1,32 @@
+@startuml Prompt Compaction (Simple)
+
+title Prompt Compaction – Simple Flow
+skinparam monochrome true
+
+actor User
+participant Agent
+participant LLM
+participant Compactor
+database History
+
+User -> Agent: Send message
+Agent -> History: Save message
+
+loop Each turn
+    Agent -> LLM: Send conversation
+    LLM --> Agent: Reply
+    Agent -> History: Save reply
+
+    Agent -> Compactor: Is context too large?
+
+    alt No
+        Compactor --> Agent: Keep as is
+    else Yes
+        Compactor -> LLM: Summarize old messages
+        LLM --> Compactor: Summary
+        Compactor --> Agent: New compacted context
+        Agent -> History: Replace old history
+    end
+end
+
+@enduml
